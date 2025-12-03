@@ -1,26 +1,36 @@
-
 import 'package:flutter/material.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kistflow/views/auth/OTP_verification_screen.dart';
+import 'package:kistflow/views/auth/reset_password_screen.dart';
+import 'package:kistflow/widgets/auth/auth_container.dart';
+import 'package:kistflow/widgets/auth/auth_text_field.dart';
 import '../../core/app_colors.dart';
-import 'OTP_verification_screen.dart';
+import '../../viewmodels/auth_viewmodel/forgot_password_viewmodel.dart';
+import '../../widgets/auth/auth_background.dart';
+import '../../widgets/auth/auth_button.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
+class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({Key? key}) : super(key: key);
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
+// 2️⃣ State class (tumhara existing code)
+class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
     with SingleTickerProviderStateMixin {
-  final TextEditingController _emailController = TextEditingController();
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
+  late TextEditingController _emailController;
+
   @override
   void initState() {
     super.initState();
+    _emailController = TextEditingController();
+
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -30,13 +40,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
       CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
     );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutCubic,
-    ));
+    _slideAnimation = Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero)
+        .animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
+    );
 
     _animationController.forward();
   }
@@ -50,184 +57,124 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
 
   @override
   Widget build(BuildContext context) {
+    final forgotState = ref.watch(forgotPasswordProvider);
+    final forgotVM = ref.read(forgotPasswordProvider.notifier);
+
+    // Sync controller with state
+    _emailController.value =
+        _emailController.value.copyWith(text: forgotState.email);
+
     return Scaffold(
       backgroundColor: AppColors.offWhite,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: SlideTransition(
-                position: _slideAnimation,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Illustration
-                    Center(
-                      child: Container(
-                        width: 140,
-                        height: 140,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              AppColors.primaryTeal.withOpacity(0.2),
-                              AppColors.primaryTeal.withOpacity(0.1),
-                            ],
-                          ),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.lock_reset,
-                          size: 70,
-                          color: AppColors.primaryTeal,
-                        ),
-                      ),
+      body: Stack(
+        children: [
+          const AuthBackground(),
+          Column(
+            children: [
+              const SizedBox(height: 60),
+              Center(
+                child: Container(
+                  width: 140,
+                  height: 140,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColors.primaryTeal.withOpacity(0.2),
+                        AppColors.primaryTeal.withOpacity(0.1),
+                      ],
                     ),
-                    const SizedBox(height: 40),
-
-                    // Title
-                    const Text(
-                      'Forgot Password?',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.slateGray,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Subtitle
-                    Text(
-                      'Don\'t worry! Enter your email address and we\'ll send you a verification code to reset your password.',
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: AppColors.darkGrey.withOpacity(0.8),
-                        height: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-
-                    // Email Field
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 15,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: TextField(
-                        cursorColor: AppColors.primaryTeal,
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: AppColors.slateGray,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'Enter your email',
-                          hintStyle: TextStyle(
-                            color: AppColors.darkGrey.withOpacity(0.5),
-                          ),
-                          prefixIcon: Container(
-                            margin: const EdgeInsets.all(12),
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryTeal.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Icon(
-                              Icons.email_outlined,
-                              color: AppColors.primaryTeal,
-                              size: 20,
-                            ),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 18,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Send Code Button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 56,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => OTPVerificationScreen(
-                                email: _emailController.text,
-                              ),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryTeal,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          shadowColor: AppColors.primaryTeal.withOpacity(0.3),
-                        ),
-                        child: const Text(
-                          'Send Verification Code',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Remember Password
-                    Center(
-                      child: TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.arrow_back,
-                              size: 18,
-                              color: AppColors.primaryTeal,
-                            ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              'Back to Login',
-                              style: TextStyle(
-                                color: AppColors.primaryTeal,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.lock_reset,
+                    size: 70,
+                    color: AppColors.primaryTeal,
+                  ),
                 ),
               ),
-            ),
+              const SizedBox(height: 60),
+              AuthContainer(
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Forgot Password?',
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.slateGray,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Enter your email and we’ll send you a verification code.',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: AppColors.darkGrey.withOpacity(0.8),
+                            height: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+                        AuthInputField(
+                          hint: 'Email',
+                          icon: Icons.email_outlined,
+                          controller: _emailController,
+                          onChanged: forgotVM.setEmail,
+                        ),
+                        const SizedBox(height: 32),
+                        AuthButton(
+                          text: forgotState.isLoading
+                              ? 'Sending...'
+                              : 'Send Verification Code',
+                          onPressed: () async {
+                            await forgotVM.sendCode();
+                            if (!forgotState.isLoading) {
+                              Navigator.push(context, MaterialPageRoute(
+                                builder: (context) {
+                                  // return ResetPasswordScreen();
+                                  return OTPVerificationScreen(email:forgotState.email);
+                                },
+                              ),);
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        Center(
+                          child: TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.arrow_back,
+                                    size: 18, color: AppColors.primaryTeal),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Back to Login',
+                                  style: TextStyle(
+                                    color: AppColors.primaryTeal,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
+        ],
       ),
     );
   }

@@ -1,12 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kistflow/views/screens/payment_history_screen.dart';
 import 'package:kistflow/views/screens/payment_reminder_screen.dart';
+import 'package:kistflow/widgets/horizontal_doted_line.dart';
 
 import '../../core/app_colors.dart';
 import '../../models/customer.dart';
+import '../../viewmodels/customer_viewmodel/customer_detail_vm.dart';
 
-class CustomerDetailScreen extends StatelessWidget {
+class CustomerDetailScreen extends ConsumerWidget {
   final Customer customer;
 
   const CustomerDetailScreen({
@@ -24,13 +29,17 @@ class CustomerDetailScreen extends StatelessWidget {
         return const Color(0xFFF59E0B);
       case 'Overdue':
         return const Color(0xFFDC2626);
+        case 'Completed':
+        return const Color(0xFF2563EB);
       default:
         return Colors.grey;
     }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final vm = ref.watch(customerDetailVMProvider(customer));
+    vm.checkAndUpdateStatus();
     double totalPrice = double.parse(customer.totalPrice.replaceAll(',', ''));
     double totalPaid = double.parse(customer.totalPaid.replaceAll(',', ''));
     double progressPercentage = (totalPaid / totalPrice) * 100;
@@ -152,6 +161,7 @@ class CustomerDetailScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Row(
+                              crossAxisAlignment: CrossAxisAlignment.start, // important for multi-line
                               children: [
                                 Icon(
                                   Icons.location_on,
@@ -159,8 +169,18 @@ class CustomerDetailScreen extends StatelessWidget {
                                   color: AppColors.darkGrey,
                                 ),
                                 const SizedBox(width: 8),
-                                Text(customer.address,style: TextStyle(fontSize: 13,
-                                  color: AppColors.darkGrey,),),
+                                // Wrap Text in Expanded to allow multi-line
+                                Expanded(
+                                  child: Text(
+                                    customer.address,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: AppColors.darkGrey,
+                                    ),
+                                    maxLines: 2,          // maximum 2 lines
+                                    overflow: TextOverflow.ellipsis, // shows ... if text is longer
+                                  ),
+                                ),
                               ],
                             ),
                           ],
@@ -171,8 +191,29 @@ class CustomerDetailScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   //todo:add image otherwise empty
                   Center(
-                    child: SizedBox(
-                      child: Icon(
+                    child: Container(
+                      // width: 120,
+                      // height: 120,
+                      decoration: BoxDecoration(
+                        color: AppColors.slateGray.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: customer.imagePath != null && customer.imagePath!.isNotEmpty
+                          ? ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.file(
+                          File(customer.imagePath!),
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.devices,
+                              size: 40,
+                              color: AppColors.slateGray,
+                            );
+                          },
+                        ),
+                      )
+                          : Icon(
                         Icons.devices,
                         size: 40,
                         color: AppColors.slateGray,
@@ -180,54 +221,7 @@ class CustomerDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  SizedBox(
-                    height: 30,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        // Center dashed line
-                        Center(
-                          child: Text(
-                            '----------------------',
-                            textAlign: TextAlign.right,
-                            style: TextStyle(
-                              letterSpacing: 8,
-                              fontSize: 24,
-                              color: AppColors.darkGrey.withValues(alpha: 0.7),
-                            ),
-                          ),
-                        ),
-
-                        // Left circle (half outside)
-                        Positioned(
-                          left: -29,
-                          top: 5,
-                          child: Container(
-                            width: 28,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              color: AppColors.lightGrey.withValues(alpha: 0.9),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ),
-
-                        // Right circle (half outside)
-                        Positioned(
-                          right: -29,
-                          top: 5,
-                          child: Container(
-                            width: 28,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              color: AppColors.lightGrey.withValues(alpha: 0.9),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  HorizontalDotedLine(),
                   const SizedBox(height: 16),
 
                   Text(
@@ -318,54 +312,7 @@ class CustomerDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  SizedBox(
-                    height: 30,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        // Center dashed line
-                        Center(
-                          child: Text(
-                            '----------------------',
-                            textAlign: TextAlign.right,
-                            style: TextStyle(
-                              letterSpacing: 8,
-                              fontSize: 24,
-                              color: AppColors.darkGrey.withValues(alpha: 0.7),
-                            ),
-                          ),
-                        ),
-
-                        // Left circle (half outside)
-                        Positioned(
-                          left: -29,
-                          top: 5,
-                          child: Container(
-                            width: 28,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              color: AppColors.lightGrey.withValues(alpha: 0.9),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ),
-
-                        // Right circle (half outside)
-                        Positioned(
-                          right: -29,
-                          top: 5,
-                          child: Container(
-                            width: 28,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              color: AppColors.lightGrey.withValues(alpha: 0.9),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  HorizontalDotedLine(),
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -452,54 +399,7 @@ class CustomerDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  SizedBox(
-                    height: 30,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        // Center dashed line
-                        Center(
-                          child: Text(
-                            '----------------------',
-                            textAlign: TextAlign.right,
-                            style: TextStyle(
-                              letterSpacing: 8,
-                              fontSize: 24,
-                              color: AppColors.darkGrey.withValues(alpha: 0.7),
-                            ),
-                          ),
-                        ),
-
-                        // Left circle (half outside)
-                        Positioned(
-                          left: -29,
-                          top: 5,
-                          child: Container(
-                            width: 28,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              color: AppColors.lightGrey.withValues(alpha: 0.9),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ),
-
-                        // Right circle (half outside)
-                        Positioned(
-                          right: -29,
-                          top: 5,
-                          child: Container(
-                            width: 28,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              color: AppColors.lightGrey.withValues(alpha: 0.9),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  HorizontalDotedLine(),
                   const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -640,7 +540,9 @@ class CustomerDetailScreen extends StatelessWidget {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        vm.markInstallmentPaid();
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor:  AppColors.primaryTeal,
                         foregroundColor: Colors.white,

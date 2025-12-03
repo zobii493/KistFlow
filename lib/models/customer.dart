@@ -9,14 +9,17 @@ class Customer {
   final String deposit;
   final String monthlyInstallment;
   final String installmentMonths;
-  final String totalPaid;
-  final String remaining;
+
+  String totalPaid;
+  String remaining;
+  String status;
+
   final String takenDate;
   final String endDate;
-  final String nextDueDate;
-  final String status;
+  String nextDueDate;
+
   final String? imagePath;
-  final List<Map<String, dynamic>> history;
+  List<Map<String, dynamic>> history;
 
   Customer({
     required this.name,

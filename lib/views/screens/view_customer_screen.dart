@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/app_colors.dart';
 import '../../data/customer_data.dart';
 import '../../models/customer.dart';
+import '../../viewmodels/customer_viewmodel/customer_detail_vm.dart';
+import '../../viewmodels/customer_viewmodel/view_customer_vm.dart';
 import '../../widgets/custom_card/custom_card_screen.dart';
 import 'customer_details_screen.dart';
 
-class ViewCustomerScreen extends StatefulWidget {
+class ViewCustomerScreen extends ConsumerStatefulWidget {
   const ViewCustomerScreen({super.key});
 
   @override
-  State<ViewCustomerScreen> createState() => _ViewCustomerScreenState();
+  ConsumerState<ViewCustomerScreen> createState() =>
+      _ViewCustomerScreenState();
 }
 
-class _ViewCustomerScreenState extends State<ViewCustomerScreen> {
+class _ViewCustomerScreenState extends ConsumerState<ViewCustomerScreen> {
   int _selectedTabIndex = 0;
+  String _searchQuery = "";
+  bool _newestFirst = true;
 
   final List<String> _tabs = [
     'All',
@@ -22,6 +28,7 @@ class _ViewCustomerScreenState extends State<ViewCustomerScreen> {
     'Unpaid',
     'Overdue',
     'Upcoming',
+    'Completed'
   ];
 
   late List<Customer> _customers;
@@ -33,8 +40,28 @@ class _ViewCustomerScreenState extends State<ViewCustomerScreen> {
   }
 
   List<Customer> get filteredCustomers {
-    if (_selectedTabIndex == 0) return _customers;
-    return _customers.where((c) => c.status == _tabs[_selectedTabIndex]).toList();
+    final customers = ref.watch(customerProvider);
+
+    // 1. Search apply
+    List<Customer> result =
+    ref.read(customerProvider.notifier).search(_searchQuery);
+
+    //  2. Tabs filter
+    if (_selectedTabIndex != 0) {
+      result = result.where((c) => c.status == _tabs[_selectedTabIndex]).toList();
+    }
+
+    //  3. Sort newest/oldest
+    result.sort((a, b) {
+      final dateA = DateTime.tryParse(a.takenDate) ?? DateTime(2000);
+      final dateB = DateTime.tryParse(b.takenDate) ?? DateTime(2000);
+
+      return _newestFirst
+          ? dateB.compareTo(dateA)
+          : dateA.compareTo(dateB);
+    });
+
+    return result;
   }
 
   @override
@@ -59,13 +86,18 @@ class _ViewCustomerScreenState extends State<ViewCustomerScreen> {
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Row(
-                      children: const [
-                        Icon(Icons.search, color: Colors.grey),
-                        SizedBox(width: 8),
+                      children: [
+                        const Icon(Icons.search, color: Colors.grey),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: TextField(
                             cursorColor: AppColors.slateGray,
-                            decoration: InputDecoration(
+                            onChanged: (value) {
+                              setState(() {
+                                _searchQuery = value;
+                              });
+                            },
+                            decoration: const InputDecoration(
                               hintText: 'Search customer...',
                               border: InputBorder.none,
                               isDense: true,
@@ -77,16 +109,34 @@ class _ViewCustomerScreenState extends State<ViewCustomerScreen> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                Container(
-                  height: 50,
-                  width: 50,
-                  decoration: BoxDecoration(
-                    color: AppColors.offWhite,
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.filter_list, color: AppColors.slateGray),
-                    onPressed: () {},
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    setState(() {
+                      if (value == "Newest") {
+                        _newestFirst = true;
+                      } else if (value == "Oldest") {
+                        _newestFirst = false;
+                      }
+                    });
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: "Newest",
+                      child: Text("Newest"),
+                    ),
+                    const PopupMenuItem(
+                      value: "Oldest",
+                      child: Text("Oldest"),
+                    ),
+                  ],
+                  child: Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                      color: AppColors.offWhite,
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: const Icon(Icons.filter_list, color: AppColors.slateGray),
                   ),
                 ),
               ],
@@ -110,7 +160,7 @@ class _ViewCustomerScreenState extends State<ViewCustomerScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                       decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primaryTeal : Colors.grey.shade300,
+                        color: isSelected ? AppColors.primaryTeal : AppColors.offWhite,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       alignment: Alignment.center,

@@ -1,17 +1,19 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/app_colors.dart';
 import '../../models/customer.dart';
 
-class CustomerCard extends StatelessWidget {
+class CustomerCard extends ConsumerWidget {
   final Customer customer;
   final VoidCallback onTap;
 
   const CustomerCard({
-    Key? key,
+    super.key,
     required this.customer,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   Color _getStatusColor() {
     switch (customer.status) {
@@ -23,6 +25,8 @@ class CustomerCard extends StatelessWidget {
         return const Color(0xFFF59E0B);
       case 'Overdue':
         return const Color(0xFFDC2626);
+      case 'Completed':
+        return const Color(0xFF2563EB);
       default:
         return Colors.grey;
     }
@@ -38,6 +42,8 @@ class CustomerCard extends StatelessWidget {
         return const Color(0xFFFEF3C7);
       case 'Overdue':
         return const Color(0xFFFEE2E2);
+      case 'Completed':
+        return const Color(0xFFFEEAE2);
       default:
         return Colors.grey.shade200;
     }
@@ -53,13 +59,15 @@ class CustomerCard extends StatelessWidget {
         return Icons.schedule;
       case 'Overdue':
         return Icons.error;
+      case 'Completed':
+        return Icons.celebration;
       default:
         return Icons.info;
     }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -88,6 +96,7 @@ class CustomerCard extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
+                // --- IMAGE DISPLAY ---
                 Container(
                   width: 60,
                   height: 60,
@@ -98,8 +107,8 @@ class CustomerCard extends StatelessWidget {
                   child: customer.imagePath != null
                       ? ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      customer.imagePath!,
+                    child: Image.file(
+                      File(customer.imagePath!),
                       fit: BoxFit.cover,
                     ),
                   )
@@ -114,6 +123,7 @@ class CustomerCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Name & Status
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -161,6 +171,7 @@ class CustomerCard extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 4),
+                      // Phone number
                       Text(
                         customer.phoneNumber,
                         style: TextStyle(
@@ -169,6 +180,7 @@ class CustomerCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
+                      // Item Name
                       Text(
                         customer.itemName,
                         style: const TextStyle(
@@ -178,6 +190,7 @@ class CustomerCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
+                      // Next due & Monthly installment
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [

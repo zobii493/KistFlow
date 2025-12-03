@@ -1,130 +1,24 @@
-import 'dart:io';
-
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:kistflow/widgets/auth/auth_button.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kistflow/data/customer_data.dart';
+import 'package:kistflow/viewmodels/customer_viewmodel/view_customer_vm.dart';
+import 'package:kistflow/widgets/horizontal_doted_line.dart';
 
 import '../../core/app_colors.dart';
-import '../../data/customer_data.dart';
 import '../../models/customer.dart';
+import '../../viewmodels/customer_viewmodel/add_customer_viewmodel.dart';
+import '../../widgets/auth/auth_button.dart';
 
-class AddCustomerScreen extends StatefulWidget {
+class AddCustomerScreen extends ConsumerStatefulWidget {
   const AddCustomerScreen({super.key});
 
   @override
-  State<AddCustomerScreen> createState() => _AddCustomerScreenState();
+  ConsumerState<AddCustomerScreen> createState() => _AddCustomerScreenState();
 }
 
-class _AddCustomerScreenState extends State<AddCustomerScreen> {
-  // --- Customer Controllers ---
-  final TextEditingController _fullNameController = TextEditingController();
-  final TextEditingController _fatherNameController = TextEditingController();
-  final TextEditingController _cnicController = TextEditingController();
-  final TextEditingController _mobileNumberController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
-
-  // --- Item Controllers ---
-  final TextEditingController _itemNameController = TextEditingController();
-  final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _depositController = TextEditingController();
-  final TextEditingController _monthlyInstallmentController =
-      TextEditingController();
-  final TextEditingController _installmentMonthsController =
-      TextEditingController();
-  final TextEditingController _totalpriceController = TextEditingController();
-  final TextEditingController _takenDateController = TextEditingController();
-  final TextEditingController _endDateController = TextEditingController();
-
-  File? _pickedImage;
-  final ImagePicker _picker = ImagePicker();
-
-  @override
-  void initState() {
-    super.initState();
-    // Item Details logic
-    _installmentMonthsController.addListener(_calculateEndDate);
-    _takenDateController.addListener(_calculateEndDate);
-  }
-
-  Future<void> _pickImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-
-    if (image != null) {
-      setState(() {
-        _pickedImage = File(image.path);
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    // Dispose Customer Controllers
-    _fullNameController.dispose();
-    _fatherNameController.dispose();
-    _cnicController.dispose();
-    _mobileNumberController.dispose();
-    _addressController.dispose();
-    // Dispose Item Controllers
-    _itemNameController.dispose();
-    _priceController.dispose();
-    _depositController.dispose();
-    _totalpriceController.dispose();
-    _monthlyInstallmentController.dispose();
-    _installmentMonthsController.dispose();
-    _takenDateController.dispose();
-    _endDateController.dispose();
-    super.dispose();
-  }
-
-  // --- Item Logic ---
-
-  Future<void> _selectDate(BuildContext context) async {
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null) {
-      setState(() {
-        _takenDateController.text =
-            "${picked.month.toString().padLeft(2, '0')}/${picked.day.toString().padLeft(2, '0')}/${picked.year}";
-      });
-    }
-  }
-
-  void _calculateEndDate() {
-    if (_takenDateController.text.isNotEmpty &&
-        _installmentMonthsController.text.isNotEmpty) {
-      try {
-        List<String> dateParts = _takenDateController.text.split('/');
-        int month = int.parse(dateParts[0]);
-        int day = int.parse(dateParts[1]);
-        int year = int.parse(dateParts[2]);
-
-        DateTime takenDate = DateTime(year, month, day);
-        int installmentMonths = int.parse(_installmentMonthsController.text);
-
-        DateTime endDate = DateTime(
-          takenDate.year,
-          takenDate.month + installmentMonths,
-          takenDate.day,
-        );
-
-        _endDateController.text =
-            "${endDate.month.toString().padLeft(2, '0')}/${endDate.day.toString().padLeft(2, '0')}/${endDate.year}";
-      } catch (e) {
-        _endDateController.text = "Error"; // Handle format error
-      }
-    } else {
-      _endDateController.text = "Auto Calculated";
-    }
-  }
-
-  // --- Reusable TextField Widget ---
-
+class _AddCustomerScreenState extends ConsumerState<AddCustomerScreen> {
   Widget _buildTextField(
     TextEditingController controller, {
     String? hintText,
@@ -181,9 +75,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
         ),
       ],
     );
-  }
-
-  // --- Widget Builders ---
+  } // --- Widget Builders ---
 
   Widget _buildSectionHeader(String title) {
     return Padding(
@@ -222,9 +114,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     );
   }
 
-  // --- Customer Information Section ---
-
-  Widget _buildCustomerInformation() {
+  Widget _buildCustomerInformation(AddCustomerViewModel vm) {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -242,96 +132,37 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Center(child: _buildSectionHeader('Customer Information')),
-          SizedBox(
-            height: 30,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                // Center dashed line
-                Center(
-                  child: Text(
-                    '----------------------',
-                    style: TextStyle(
-                      letterSpacing: 8,
-                      fontSize: 24,
-                      color: AppColors.darkGrey.withValues(alpha: 0.7),
-                    ),
-                  ),
-                ),
-
-                // Left circle (half outside)
-                Positioned(
-                  left: -27,
-                  top: 5,
-                  child: Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: AppColors.lightGrey.withValues(alpha: 0.9),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-
-                // Right circle (half outside)
-                Positioned(
-                  right: -27,
-                  top: 5,
-                  child: Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: AppColors.lightGrey.withValues(alpha: 0.9),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
+          HorizontalDotedLine(),
           const SizedBox(height: 20),
-
-          // Full Name
           _buildLabel('Full Name'),
           _buildTextField(
-            _fullNameController,
+            vm.fullName,
             hintText: 'Enter customer name',
             required: true,
           ),
           const SizedBox(height: 16),
-
-          // Father Name
           _buildLabel('Father Name'),
           _buildTextField(
-            _fatherNameController,
+            vm.fatherName,
             hintText: 'Enter father name',
             required: true,
           ),
           const SizedBox(height: 16),
-          // CNIC
           _buildLabel('CNIC'),
-          _buildTextField(
-            _cnicController,
-            hintText: 'xxxxx-xxxxxxx-x',
-            required: true,
-          ),
+          _buildTextField(vm.cnic, hintText: 'xxxxx-xxxxxxx-x', required: true),
           const SizedBox(height: 16),
-          // Mobile Number
           _buildLabel('Mobile Number'),
           _buildTextField(
-            _mobileNumberController,
+            vm.mobile,
             hintText: '03XX-XXXXXXX',
             keyboardType: TextInputType.phone,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             required: true,
           ),
           const SizedBox(height: 16),
-
-          // Address
           _buildLabel('Address'),
           _buildTextField(
-            _addressController,
+            vm.address,
             hintText: 'Enter complete address',
             maxLines: 4,
             required: true,
@@ -341,9 +172,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     );
   }
 
-  // --- Item Details Section ---
-
-  Widget _buildItemDetails() {
+  Widget _buildItemDetails(AddCustomerViewModel vm) {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -361,61 +190,11 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Center(child: _buildSectionHeader('Item Details')),
-          SizedBox(
-            height: 30,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                // Center dashed line
-                Center(
-                  child: Text(
-                    '----------------------',
-                    style: TextStyle(
-                      letterSpacing: 8,
-                      fontSize: 24,
-                      color: AppColors.darkGrey.withValues(alpha: 0.7),
-                    ),
-                  ),
-                ),
-
-                // Left circle (half outside)
-                Positioned(
-                  left: -27,
-                  top: 5,
-                  child: Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: AppColors.lightGrey.withValues(alpha: 0.9),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-
-                // Right circle (half outside)
-                Positioned(
-                  right: -27,
-                  top: 5,
-                  child: Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: AppColors.lightGrey.withValues(alpha: 0.9),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          HorizontalDotedLine(),
           const SizedBox(height: 10),
-
-          // Item Name
           _buildLabel('Item Name', isRequired: true),
-          _buildTextField(_itemNameController, hintText: 'e.g., Mobile'),
+          _buildTextField(vm.itemName, hintText: 'e.g., Mobile'),
           const SizedBox(height: 16),
-
-          // Price & Deposit Row
           Row(
             children: [
               Expanded(
@@ -424,7 +203,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                   children: [
                     _buildLabel('Cash Price', isRequired: true),
                     _buildTextField(
-                      _priceController,
+                      vm.price,
                       hintText: 'Cash Price',
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -439,7 +218,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                   children: [
                     _buildLabel('Advance', isRequired: true),
                     _buildTextField(
-                      _depositController,
+                      vm.deposit,
                       hintText: 'Advance Payment',
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -450,8 +229,6 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
             ],
           ),
           const SizedBox(height: 16),
-
-          // Monthly Installment & Installment Months Row
           Row(
             children: [
               Expanded(
@@ -459,11 +236,11 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildLabel('Installment Months', isRequired: true),
-                    _buildTextField(
-                      _installmentMonthsController,
-                      hintText: 'Total Months',
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    Row(
+                      children: [
+                        _monthButton(vm, 6, '6 Months', 25),
+                        _monthButton(vm, 9, '9 Months', 32),
+                      ],
                     ),
                   ],
                 ),
@@ -475,10 +252,9 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                   children: [
                     _buildLabel('Monthly Installment', isRequired: true),
                     _buildTextField(
-                      _monthlyInstallmentController,
+                      vm.monthlyInstallment,
                       hintText: 'Amount',
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      readOnly: true,
                     ),
                   ],
                 ),
@@ -488,13 +264,11 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
           const SizedBox(height: 16),
           _buildLabel('Total Price', isRequired: true),
           _buildTextField(
-            _totalpriceController,
+            vm.totalPrice,
             hintText: 'Total Price',
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            readOnly: true,
           ),
           const SizedBox(height: 16),
-          // Taken Date & End Date Row
           Row(
             children: [
               Expanded(
@@ -503,15 +277,15 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                   children: [
                     _buildLabel('Taken Date', isRequired: true),
                     _buildTextField(
-                      _takenDateController,
+                      vm.takenDate,
                       hintText: 'mm/dd/yyyy',
                       readOnly: true,
                       suffixIcon: IconButton(
                         icon: const Icon(
                           Icons.calendar_month,
-                          color: AppColors.darkGrey,
+                          color: Colors.grey,
                         ),
-                        onPressed: () => _selectDate(context),
+                        onPressed: () => vm.pickDate(context),
                       ),
                     ),
                   ],
@@ -524,10 +298,9 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                   children: [
                     _buildLabel('End Date (Est.)', isRequired: true),
                     _buildTextField(
-                      _endDateController,
+                      vm.endDate,
                       hintText: 'Auto Calculated',
                       readOnly: true,
-                      fillColor: AppColors.lightGrey.withOpacity(0.5),
                     ),
                   ],
                 ),
@@ -539,8 +312,38 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     );
   }
 
-  //---Image Upload Section---
-  Widget _buildImageUpload() {
+  Widget _monthButton(
+    AddCustomerViewModel vm,
+    int months,
+    String text,
+    double interest,
+  ) {
+    final isSelected = vm.selectedMonths == months;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => vm.selectMonths(months, interest),
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.primaryTeal : AppColors.lightGrey,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            text,
+            style: TextStyle(
+              color: isSelected ? Colors.white : Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // --- Image Upload Section ---
+  Widget _buildImageUpload(AddCustomerViewModel vm) {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -558,53 +361,11 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Center(child: _buildSectionHeader('Item Image')),
-          SizedBox(
-            height: 30,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Center(
-                  child: Text(
-                    '----------------------',
-                    style: TextStyle(
-                      letterSpacing: 8,
-                      fontSize: 24,
-                      color: AppColors.darkGrey.withValues(alpha: 0.7),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: -27,
-                  top: 5,
-                  child: Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: AppColors.lightGrey.withValues(alpha: 0.9),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  right: -27,
-                  top: 5,
-                  child: Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: AppColors.lightGrey.withValues(alpha: 0.9),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          HorizontalDotedLine(),
           const SizedBox(height: 16),
-
-          //IMAGE PICKER UI
           GestureDetector(
-            onTap: _pickImage,
+            onTap: vm.pickImage,
+            behavior: HitTestBehavior.opaque,
             child: DottedBorder(
               options: RoundedRectDottedBorderOptions(
                 dashPattern: [10, 5],
@@ -618,14 +379,14 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                 width: double.infinity,
                 alignment: Alignment.center,
                 padding: const EdgeInsets.all(10),
-                child: _pickedImage == null
+                child: vm.pickedImage == null
                     ? Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
                             Icons.cloud_upload_rounded,
                             size: 40,
-                            color: AppColors.darkGrey.withValues(alpha: 0.5),
+                            color: AppColors.darkGrey.withAlpha(120),
                           ),
                           const SizedBox(height: 10),
                           Text(
@@ -641,7 +402,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                     : ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: Image.file(
-                          _pickedImage!,
+                          vm.pickedImage!,
                           width: double.infinity,
                           fit: BoxFit.cover,
                         ),
@@ -654,10 +415,9 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     );
   }
 
-  // --- Main Build Method ---
-
   @override
   Widget build(BuildContext context) {
+    final vm = ref.watch(addCustomerVMProvider);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -677,13 +437,12 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Form(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildCustomerInformation(),
+              _buildCustomerInformation(vm),
               const SizedBox(height: 24),
-              _buildItemDetails(),
+              _buildItemDetails(vm),
               const SizedBox(height: 24),
-              _buildImageUpload(),
+              _buildImageUpload(vm),
               const SizedBox(height: 32),
               SizedBox(
                 height: 55,
@@ -692,31 +451,29 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                   text: 'Save Plan',
                   onPressed: () {
                     Customer newCustomer = Customer(
-                      name: _fullNameController.text,
-                      fatherName: _fatherNameController.text,
-                      cnic: _cnicController.text,
-                      phoneNumber: _mobileNumberController.text,
-                      address: _addressController.text,
-                      itemName: _itemNameController.text,
-                      totalPrice: _priceController.text,
-                      deposit: _depositController.text,
-                      monthlyInstallment: _monthlyInstallmentController.text,
-                      installmentMonths: _installmentMonthsController.text,
-                      takenDate: _takenDateController.text,
-                      endDate: _endDateController.text,
-                      nextDueDate: "Not Set",
-                      imagePath: _pickedImage?.path,
-                      totalPaid: "0",
-                      remaining: _priceController.text,
+                      name: vm.fullName.text,
+                      fatherName: vm.fatherName.text,
+                      cnic: vm.cnic.text,
+                      phoneNumber: vm.mobile.text,
+                      address: vm.address.text,
+                      itemName: vm.itemName.text,
+                      totalPrice: vm.totalPrice.text,
+                      deposit: vm.deposit.text,
+                      monthlyInstallment: vm.monthlyInstallment.text,
+                      installmentMonths: vm.installmentMonths.text,
+                      takenDate: vm.takenDate.text,
+                      endDate: vm.endDate.text,
+                      nextDueDate: _getNextDueDate(vm.takenDate.text),
+                      imagePath: vm.pickedImage?.path,
+                      totalPaid: vm.deposit.text,
+                      remaining: (double.parse(vm.totalPrice.text) - double.parse(vm.deposit.text)).toStringAsFixed(0),
                       status: "Upcoming",
                       history: [],
                     );
-
-                    customerList.add(newCustomer);
-
+                    ref.read(customerProvider.notifier).addCustomer(newCustomer);
+                    // customerList.add(newCustomer);
                     Navigator.pop(context);
-                  },
-                  backgroundColor: AppColors.primaryTeal,
+                  }, // backgroundColor: AppColors.primaryTeal,
                 ),
               ),
               const SizedBox(height: 120),
@@ -726,4 +483,11 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
       ),
     );
   }
+
+  String _getNextDueDate(String takenDate) {
+    DateTime d = DateTime.parse(takenDate); // must be yyyy-MM-dd
+    DateTime next = DateTime(d.year, d.month + 1, d.day);
+    return next.toIso8601String().split("T").first;
+  }
+
 }
