@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "428747479554",
+    "project_id": "kistflow",
+    "storage_bucket": "kistflow.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:428747479554:android:2917a1b14979ed2d49251b",
+        "android_client_info": {
+          "package_name": "com.example.kistflow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "428747479554-45mfkcju7vohcffsehrshe8809j15gic.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.kistflow",
+            "certificate_hash": "47487af7acae3ac79e349f404a246c0ec6e9037b"
+          }
+        },
+        {
+          "client_id": "428747479554-hqm8l4h09so2oced383phc7k2c39ddo9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOOqK-tA-SGzoGLDtEY1PyMAs5uMFfNHA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "428747479554-hqm8l4h09so2oced383phc7k2c39ddo9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
