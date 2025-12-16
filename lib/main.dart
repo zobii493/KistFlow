@@ -5,6 +5,8 @@ import 'package:kistflow/core/app_theme.dart';
 import 'package:kistflow/routes/app_routes.dart';
 import 'package:kistflow/viewmodels/theme_vm.dart';
 
+import 'core/app_colors.dart';
+
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -18,6 +20,7 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context,WidgetRef ref) {
     final themeMode = ref.watch(themeViewModelProvider);
     return MaterialApp(
+      color: AppColors.offWhiteOf(context),
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
