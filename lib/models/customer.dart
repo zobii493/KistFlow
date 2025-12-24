@@ -8,7 +8,7 @@ class Customer {
   final String itemName;
   final String totalPrice;
   final String deposit;
-  final String monthlyInstallment;
+  String monthlyInstallment;
   final String installmentMonths;
 
   String totalPaid;

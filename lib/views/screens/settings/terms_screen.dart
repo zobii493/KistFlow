@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/app_colors.dart';
 import '../../../widgets/appbar.dart';
-import '../../../widgets/setting_widgets/info_card.dart';
-import '../../../widgets/setting_widgets/policy_item.dart';
+import 'Widgets/info_card.dart';
+import 'Widgets/policy_item.dart';
 
 class TermsAndConditionsPage extends StatelessWidget {
   const TermsAndConditionsPage({Key? key}) : super(key: key);
@@ -23,7 +23,7 @@ class TermsAndConditionsPage extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
-                color: AppColors.primaryTealOf(context).withOpacity(0.1),
+                color: AppColors.primaryTealOf(context).withValues(alpha:0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -102,14 +102,14 @@ class TermsAndConditionsPage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.primaryTealOf(context).withOpacity(0.05),
+                color: AppColors.primaryTealOf(context).withValues(alpha:0.05),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
                 'Note: These Terms & Conditions are designed to protect both the user and the app provider. For any questions or clarifications, contact support via email or WhatsApp.',
                 style: TextStyle(
                   fontSize: 14,
-                  color: AppColors.darkGreyOf(context).withOpacity(0.9),
+                  color: AppColors.darkGreyOf(context).withValues(alpha:0.9),
                   height: 1.4,
                 ),
               ),

@@ -47,7 +47,8 @@ class CustomerNotifier extends StateNotifier<List<Customer>> {
           itemName: data['item']['name'] ?? '',
           totalPrice: data['item']['totalPrice'].toString(),
           deposit: data['item']['deposit'].toString(),
-          monthlyInstallment: data['item']['monthlyInstallment'].toString(),
+          monthlyInstallment: data['monthlyInstallment']?.toString() ??
+              data['item']['monthlyInstallment'].toString(),
           installmentMonths: data['item']['installmentMonths'].toString(),
           totalPaid: data['totalPaid'].toString(),
           remaining: data['remaining'].toString(),

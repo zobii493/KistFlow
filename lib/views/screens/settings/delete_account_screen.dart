@@ -5,7 +5,7 @@ import 'package:kistflow/widgets/appbar.dart';
 
 import '../../../core/app_colors.dart';
 import '../../../routes/app_routes.dart';
-import '../../../viewmodels/setting_vm.dart';
+import '../../../viewmodels/setting_viewmodel/setting_vm.dart';
 import '../../../widgets/auth/auth_text_field.dart';
 import '../../../widgets/auth/button.dart';
 
@@ -180,7 +180,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: AppColors.pinkOf(context).withOpacity(0.1),
+                    color: AppColors.pinkOf(context).withValues(alpha:0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -216,10 +216,10 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.pinkOf(context).withOpacity(0.1),
+                  color: AppColors.pinkOf(context).withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: AppColors.pinkOf(context).withOpacity(0.3),
+                    color: AppColors.pinkOf(context).withValues(alpha:0.3),
                     width: 2,
                   ),
                 ),
@@ -283,7 +283,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: _confirmDelete
-                        ? AppColors.pinkOf(context).withOpacity(0.3)
+                        ? AppColors.pinkOf(context).withValues(alpha:0.3)
                         : Colors.grey.shade300,
                   ),
                 ),

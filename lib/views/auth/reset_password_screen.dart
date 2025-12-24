@@ -64,8 +64,8 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      AppColors.primaryTealOf(context).withOpacity(0.2),
-                      AppColors.primaryTealOf(context).withOpacity(0.1),
+                      AppColors.primaryTealOf(context).withValues(alpha:0.2),
+                      AppColors.primaryTealOf(context).withValues(alpha:0.1),
                     ],
                   ),
                   shape: BoxShape.circle,
@@ -97,7 +97,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen>
                         'Create a strong password for ${widget.email}',
                         style: TextStyle(
                           fontSize: 15,
-                          color: AppColors.darkGreyOf(context).withOpacity(0.8),
+                          color: AppColors.darkGreyOf(context).withValues(alpha:0.8),
                           height: 1.5,
                         ),
                       ),

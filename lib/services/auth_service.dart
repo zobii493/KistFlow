@@ -102,7 +102,7 @@ class AuthService {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('userName', user.displayName ?? 'User');
         await prefs.setString('userEmail', user.email ?? '');
-        await prefs.setString('userAvatar', 'assets/avatars/avatar1.png');
+        await prefs.setString('userAvatar', 'assets/avatars/avatar9.png');
         await prefs.setString('userId', user.uid);
       }
     } catch (e) {

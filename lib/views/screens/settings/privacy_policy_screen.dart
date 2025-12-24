@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/app_colors.dart';
 import '../../../widgets/appbar.dart';
-import '../../../widgets/setting_widgets/info_card.dart';
-import '../../../widgets/setting_widgets/policy_item.dart';
+import 'Widgets/info_card.dart';
+import 'Widgets/policy_item.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
   const PrivacyPolicyPage({Key? key}) : super(key: key);

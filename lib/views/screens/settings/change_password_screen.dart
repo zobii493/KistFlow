@@ -4,7 +4,7 @@ import 'package:kistflow/helpers/ui_helper.dart';
 import 'package:kistflow/widgets/appbar.dart';
 
 import '../../../core/app_colors.dart';
-import '../../../viewmodels/setting_vm.dart';
+import '../../../viewmodels/setting_viewmodel/setting_vm.dart';
 import '../../../widgets/auth/auth_text_field.dart';
 import '../../../widgets/auth/button.dart';
 
@@ -135,7 +135,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: AppColors.primaryTealOf(context).withOpacity(0.1),
+                    color: AppColors.primaryTealOf(context).withValues(alpha:0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -203,10 +203,10 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryTealOf(context).withOpacity(0.1),
+                  color: AppColors.primaryTealOf(context).withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: AppColors.primaryTealOf(context).withOpacity(0.3),
+                    color: AppColors.primaryTealOf(context).withValues(alpha:0.3),
                   ),
                 ),
                 child: Row(

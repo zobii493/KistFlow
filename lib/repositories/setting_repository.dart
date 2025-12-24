@@ -29,27 +29,27 @@ class SettingsRepository {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('userName', data['name'] ?? user.displayName ?? 'User');
         await prefs.setString('userEmail', user.email ?? '');
-        await prefs.setString('userAvatar', data['avatar'] ?? 'assets/avatars/avatar1.png');
+        await prefs.setString('userAvatar', data['avatar'] ?? 'assets/avatars/avatar9.png');
         await prefs.setString('userId', user.uid);
 
         return UserProfile(
           name: data['name'] ?? user.displayName ?? 'User',
           email: user.email ?? '',
-          avatar: data['avatar'] ?? 'assets/avatars/avatar1.png',
+          avatar: data['avatar'] ?? 'assets/avatars/avatar9.png',
         );
       } else {
         // Agar Firestore me data nahi hai, to create karo
         await _firestore.collection('users').doc(user.uid).set({
           'name': user.displayName ?? 'User',
           'email': user.email,
-          'avatar': 'assets/avatars/avatar1.png',
+          'avatar': 'assets/avatars/avatar9.png',
           'created_at': FieldValue.serverTimestamp(),
         });
 
         return UserProfile(
           name: user.displayName ?? 'User',
           email: user.email ?? '',
-          avatar: 'assets/avatars/avatar1.png',
+          avatar: 'assets/avatars/avatar9.png',
         );
       }
     } catch (e) {

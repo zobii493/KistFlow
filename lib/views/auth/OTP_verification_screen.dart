@@ -85,8 +85,8 @@ class _OTPVerificationScreenState extends ConsumerState<OTPVerificationScreen>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      AppColors.primaryTealOf(context).withOpacity(.2),
-                      AppColors.primaryTealOf(context).withOpacity(.1),
+                      AppColors.primaryTealOf(context).withValues(alpha:.2),
+                      AppColors.primaryTealOf(context).withValues(alpha:.1),
                     ],
                   ),
                 ),
@@ -117,7 +117,7 @@ class _OTPVerificationScreenState extends ConsumerState<OTPVerificationScreen>
                         text: TextSpan(
                           style: TextStyle(
                             fontSize: 15,
-                            color: AppColors.darkGreyOf(context).withOpacity(0.8),
+                            color: AppColors.darkGreyOf(context).withValues(alpha:0.8),
                           ),
                           children: [
                             TextSpan(
@@ -195,7 +195,7 @@ class _OTPVerificationScreenState extends ConsumerState<OTPVerificationScreen>
                           style: TextStyle(
                             fontSize: 15,
                             color:
-                            AppColors.darkGreyOf(context).withOpacity(.6),
+                            AppColors.darkGreyOf(context).withValues(alpha:.6),
                           ),
                         ),
                       ),
@@ -301,7 +301,7 @@ class _OTPVerificationScreenState extends ConsumerState<OTPVerificationScreen>
         border: Border.all(color: AppColors.primaryTealOf(context), width: 2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(.05),
+            color: Colors.black.withValues(alpha:.05),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),

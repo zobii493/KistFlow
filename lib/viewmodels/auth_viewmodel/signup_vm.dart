@@ -170,7 +170,7 @@ class SignupViewModel extends StateNotifier<SignupState> {
           .set({
         'name': state.name,
         'email': state.email,
-        'avatar': 'assets/avatars/avatar1.png',
+        'avatar': 'assets/avatars/avatar15.png',
         'created_at': FieldValue.serverTimestamp(),
       });
 

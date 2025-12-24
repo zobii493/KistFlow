@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kistflow/core/app_theme.dart';
 import 'package:kistflow/routes/app_routes.dart';
-import 'package:kistflow/viewmodels/theme_vm.dart';
+import 'package:kistflow/viewmodels/setting_viewmodel/theme_vm.dart';
 
 import 'core/app_colors.dart';
 

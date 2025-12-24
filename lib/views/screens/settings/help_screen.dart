@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/app_colors.dart';
 import '../../../widgets/appbar.dart';
-import '../../../widgets/setting_widgets/faq_item.dart';
-import '../../../widgets/setting_widgets/info_card.dart';
+import 'Widgets/faq_item.dart';
+import 'Widgets/info_card.dart';
 
 class HelpPage extends StatelessWidget {
   const HelpPage({Key? key}) : super(key: key);

@@ -51,6 +51,7 @@ dependencies:
   flutter_multi_formatter: ^2.13.10
   cloudinary_public: ^0.23.1
   intl: ^0.20.2
+  confetti: ^0.8.0
 #  supabase_flutter: ^2.10.3
 
 dev_dependencies:

@@ -5,6 +5,8 @@ import 'package:kistflow/helpers/fade_slide_transition.dart';
 import '../../core/app_colors.dart';
 import '../../helpers/ui_helper.dart';
 import '../../viewmodels/auth_viewmodel/login_vm.dart';
+import '../../viewmodels/bottom_nav_vm.dart';
+import '../../viewmodels/setting_viewmodel/setting_vm.dart';
 import '../../widgets/auth/auth_background.dart';
 import '../../widgets/auth/button.dart';
 import '../../widgets/auth/auth_container.dart';
@@ -173,8 +175,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             isError: !result['success'],
                           );
                           if (result['success']) {
-                            Navigator.pushReplacementNamed(
-                                context, '/bottomnavbar');
+                            await ref
+                                .read(settingsViewModelProvider.notifier)
+                                .refreshUserData();
+                            ref.read(navIndexProvider.notifier).state = 0;
+                            // Navigator.pushReplacementNamed(
+                            //     context, '/bottomnavbar');
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              '/bottomnavbar',
+                                  (route) => false,
+                            );
                           }
                         },
                       ),

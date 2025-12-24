@@ -63,8 +63,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      AppColors.primaryTealOf(context).withOpacity(0.2),
-                      AppColors.primaryTealOf(context).withOpacity(0.1),
+                      AppColors.primaryTealOf(context).withValues(alpha:0.2),
+                      AppColors.primaryTealOf(context).withValues(alpha:0.1),
                     ],
                   ),
                   shape: BoxShape.circle,
@@ -96,7 +96,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
                         'Enter your email and we\'ll send you a verification code.',
                         style: TextStyle(
                           fontSize: 15,
-                          color: AppColors.darkGreyOf(context).withOpacity(0.8),
+                          color: AppColors.darkGreyOf(context).withValues(alpha:0.8),
                           height: 1.5,
                         ),
                       ),
