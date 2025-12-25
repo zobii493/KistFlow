@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -23,18 +24,20 @@ class CustomerDetailScreen extends ConsumerStatefulWidget {
   }) : super(key: key);
 
   @override
-  ConsumerState<CustomerDetailScreen> createState() => _CustomerDetailScreenState();
+  ConsumerState<CustomerDetailScreen> createState() =>
+      _CustomerDetailScreenState();
 }
 
 class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
   bool _isLoading = false;
   late ConfettiController _confettiController;
 
-
   @override
   void initState() {
     super.initState();
-    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 3),
+    );
   }
 
   @override
@@ -42,7 +45,6 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
     _confettiController.dispose();
     super.dispose();
   }
-
 
   Color _getStatusColor(String status) {
     switch (status) {
@@ -61,7 +63,10 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
     }
   }
 
-  void _showPartialPaymentDialog(Customer customer, CustomerDetailViewModel vm) {
+  void _showPartialPaymentDialog(
+    Customer customer,
+    CustomerDetailViewModel vm,
+  ) {
     final TextEditingController _controller = TextEditingController();
     final _formKey = GlobalKey<FormState>();
 
@@ -82,7 +87,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha:0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -100,7 +105,9 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryTealOf(context).withValues(alpha:0.1),
+                          color: AppColors.primaryTealOf(
+                            context,
+                          ).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
@@ -144,7 +151,9 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                       color: AppColors.offWhiteOf(context),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: AppColors.darkGreyOf(context).withValues(alpha:0.1),
+                        color: AppColors.darkGreyOf(
+                          context,
+                        ).withValues(alpha: 0.1),
                       ),
                     ),
                     child: Row(
@@ -181,7 +190,6 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                       color: AppColors.slateGrayOf(context),
                     ),
                     decoration: InputDecoration(
-
                       hint: Text('Payment Amount'),
                       hintStyle: TextStyle(
                         color: AppColors.darkGreyOf(context),
@@ -205,7 +213,9 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
-                          color: AppColors.darkGreyOf(context).withValues(alpha:0.1),
+                          color: AppColors.darkGreyOf(
+                            context,
+                          ).withValues(alpha: 0.1),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -253,7 +263,9 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             side: BorderSide(
-                              color: AppColors.darkGreyOf(context).withValues(alpha:0.3),
+                              color: AppColors.darkGreyOf(
+                                context,
+                              ).withValues(alpha: 0.3),
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -274,7 +286,9 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                         child: ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              double paidAmount = double.parse(_controller.text);
+                              double paidAmount = double.parse(
+                                _controller.text,
+                              );
 
                               vm.markPartialPayment(paidAmount);
 
@@ -323,21 +337,23 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
-    final customer = ref.watch(customerProvider)
+    final customer = ref
+        .watch(customerProvider)
         .firstWhere((c) => c.id == widget.customerId);
 
     final vm = ref.watch(customerDetailVMProvider(customer));
 
-    double totalPrice = double.parse(vm.customer.totalPrice.replaceAll(',', ''));
+    double totalPrice = double.parse(
+      vm.customer.totalPrice.replaceAll(',', ''),
+    );
     double totalPaid = double.parse(vm.customer.totalPaid.replaceAll(',', ''));
     double progressPercentage = (totalPaid / totalPrice) * 100;
 
     return Scaffold(
       backgroundColor: AppColors.offWhiteOf(context),
-      appBar: Appbar(text: 'Customer Details',),
+      appBar: Appbar(text: 'Customer Details'),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -354,7 +370,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha:0.06),
+                        color: Colors.black.withValues(alpha: 0.06),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -371,7 +387,8 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       customer.name,
@@ -387,7 +404,9 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                                         vertical: 4,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: _getStatusColor(customer.status).withValues(alpha:0.2),
+                                        color: _getStatusColor(
+                                          customer.status,
+                                        ).withValues(alpha: 0.2),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(
@@ -395,7 +414,9 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                                         style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,
-                                          color: _getStatusColor(customer.status),
+                                          color: _getStatusColor(
+                                            customer.status,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -474,28 +495,70 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                         ],
                       ),
                       const SizedBox(height: 16),
+
                       Center(
-                        child: customer.imagePath != null && customer.imagePath!.isNotEmpty
+                        child:
+                            customer.imagePath != null &&
+                                customer.imagePath!.isNotEmpty
                             ? ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.network(
-                            customer.imagePath!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Icon(
-                                Icons.devices,
-                                size: 40,
-                                color: AppColors.darkGreyOf(context),
-                              );
-                            },
-                          ),
-                        )
-                            : Icon(
-                          Icons.devices,
-                          size: 40,
-                          color: AppColors.darkGreyOf(context),
-                        ),
+                                borderRadius: BorderRadius.circular(12),
+                                child: CachedNetworkImage(
+                                  imageUrl: customer.imagePath!,
+                                  fit: BoxFit.cover,
+                                  // memCacheHeight: 240,
+                                  // Memory optimization
+                                  // memCacheWidth: 240,
+                                  placeholder: (context, url) => Container(
+                                    width: 120,
+                                    height: 120,
+                                    color: AppColors.slateGray.withValues(
+                                      alpha: 0.3,
+                                    ),
+                                    child: const Center(
+                                      child: SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      Container(
+                                        width: 120,
+                                        height: 120,
+                                        color: AppColors.slateGray.withValues(
+                                          alpha: 0.2,
+                                        ),
+                                        child: Icon(
+                                          Icons.devices,
+                                          size: 40,
+                                          color: AppColors.darkGreyOf(context),
+                                        ),
+                                      ),
+                                  fadeInDuration: const Duration(
+                                    milliseconds: 300,
+                                  ),
+                                ),
+                              )
+                            : Container(
+                                width: 120,
+                                height: 120,
+                                decoration: BoxDecoration(
+                                  color: AppColors.slateGray.withValues(
+                                    alpha: 0.2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(
+                                  Icons.devices,
+                                  size: 40,
+                                  color: AppColors.darkGreyOf(context),
+                                ),
+                              ),
                       ),
+
                       const SizedBox(height: 16),
                       HorizontalDotedLine(),
                       const SizedBox(height: 16),
@@ -569,7 +632,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha:0.06),
+                        color: Colors.black.withValues(alpha: 0.06),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -656,7 +719,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha:0.06),
+                        color: Colors.black.withValues(alpha: 0.06),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -676,7 +739,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                             ),
                           ),
                           Spacer(),
-                          if(customer.status !="Completed")
+                          if (customer.status != "Completed")
                             PopupMenuButton(
                               icon: const Icon(Icons.more_vert),
                               itemBuilder: (context) => [
@@ -684,7 +747,11 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                                   value: 'edit_payment',
                                   child: Row(
                                     children: [
-                                      Icon(Icons.edit, size: 16,color: AppColors.primaryTealOf(context),),
+                                      Icon(
+                                        Icons.edit,
+                                        size: 16,
+                                        color: AppColors.primaryTealOf(context),
+                                      ),
                                       SizedBox(width: 8),
                                       Text('Edit Payment'),
                                     ],
@@ -714,9 +781,14 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                           ),
                           Spacer(),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
-                              color: AppColors.primaryTealOf(context).withValues(alpha:0.1),
+                              color: AppColors.primaryTealOf(
+                                context,
+                              ).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
@@ -728,8 +800,8 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                               ),
                             ),
                           ),
-                          // const SizedBox(width: 4),
 
+                          // const SizedBox(width: 4),
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -812,7 +884,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.warmAmber.withValues(alpha:0.1),
+                              color: AppColors.warmAmber.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
@@ -846,37 +918,41 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                             onPressed: _isLoading
                                 ? null
                                 : () async {
-                              setState(() => _isLoading = true);
-                              try {
-                                final wasCompletedBefore = customer.status == "Completed";
+                                    setState(() => _isLoading = true);
+                                    try {
+                                      final wasCompletedBefore =
+                                          customer.status == "Completed";
 
-                                await vm.markInstallmentPaid();
-                                if (!wasCompletedBefore && vm.customer.status == "Completed") {
-                                  _confettiController.play();
-                                }
+                                      await vm.markInstallmentPaid();
+                                      if (!wasCompletedBefore &&
+                                          vm.customer.status == "Completed") {
+                                        _confettiController.play();
+                                      }
 
+                                      if (!mounted) return;
 
-                                if (!mounted) return;
+                                      UIHelper.showSnackBar(
+                                        context,
+                                        "Payment marked successfully!",
+                                        isError: false,
+                                      );
+                                    } catch (e) {
+                                      if (!mounted) return;
 
-                                UIHelper.showSnackBar(
-                                  context,
-                                  "Payment marked successfully!",
-                                  isError: false,
-                                );
-                              } catch (e) {
-                                if (!mounted) return;
-
-                                UIHelper.showSnackBar(
-                                  context,
-                                  "Failed to mark payment: $e",
-                                  isError: true,
-                                );
-                              } finally {
-                                if (mounted) setState(() => _isLoading = false);
-                              }
-                            },
+                                      UIHelper.showSnackBar(
+                                        context,
+                                        "Failed to mark payment: $e",
+                                        isError: true,
+                                      );
+                                    } finally {
+                                      if (mounted)
+                                        setState(() => _isLoading = false);
+                                    }
+                                  },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primaryTealOf(context).withValues(alpha: 0.8),
+                              backgroundColor: AppColors.primaryTealOf(
+                                context,
+                              ).withValues(alpha: 0.8),
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -885,30 +961,31 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                             ),
                             child: _isLoading
                                 ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
                                 : Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(Icons.check_circle, size: 20),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Mark Installment Paid',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Icon(Icons.check_circle, size: 20),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        'Mark Installment Paid',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ],
-                            ),
                           ),
                         ),
-                      if (customer.status != "Completed") const SizedBox(height: 12),
+                      if (customer.status != "Completed")
+                        const SizedBox(height: 12),
                       SizedBox(
                         width: double.infinity,
                         height: 50,
@@ -917,7 +994,8 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => PaymentHistoryScreen(customer: customer),
+                                builder: (context) =>
+                                    PaymentHistoryScreen(customer: customer),
                               ),
                             );
                           },
@@ -932,7 +1010,11 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.history, size: 20, color: AppColors.slateGrayOf(context)),
+                              Icon(
+                                Icons.history,
+                                size: 20,
+                                color: AppColors.slateGrayOf(context),
+                              ),
                               SizedBox(width: 8),
                               Text(
                                 'Show History',
@@ -979,7 +1061,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
               gravity: 0.3,
             ),
           ),
-          ],
+        ],
       ),
     );
   }

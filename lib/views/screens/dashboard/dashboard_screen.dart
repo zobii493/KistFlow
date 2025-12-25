@@ -5,38 +5,60 @@ import 'package:kistflow/views/screens/dashboard/widgets/line_chart.dart';
 import 'package:kistflow/views/screens/dashboard/widgets/pie_chart.dart';
 
 import '../../../core/app_colors.dart';
-import '../../../viewmodels/customer_viewmodel/customer_detail_vm.dart';
+import '../../../services/status_update_service.dart';
 import '../../../viewmodels/customer_viewmodel/view_customer_vm.dart';
 import '../../../viewmodels/dashboard/dashboard_vm.dart';
 import '../../../viewmodels/dashboard/notification_vm.dart';
 import '../../../viewmodels/setting_viewmodel/user_profile_vm.dart';
 
-class DashboardScreen extends ConsumerWidget {
+class DashboardScreen extends ConsumerStatefulWidget { // StatefulWidget banao
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    bool statusUpdated = false;
-    if (!statusUpdated) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(customerProvider.notifier).state.forEach((customer) {
-          CustomerDetailViewModel(
-            customer,
-            ref as Ref,
-          ).updateStatusOnScreenLoad();
-        });
-        statusUpdated = true;
-      });
-    }
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  bool _statusUpdated = false;
+  @override
+  void initState() {
+    super.initState();
+    // App open hone pe status update karo
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!_statusUpdated) {
+        final service = ref.read(statusUpdateServiceProvider);
+        await service.updateAllCustomerStatuses();
+        _statusUpdated = true;
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(dashboardProvider);
     final userName = ref.watch(userProfileProvider);
     final notificationCount = ref.watch(notificationCountProvider);
-    final unreadCount = ref.watch(notificationProvider.notifier).unreadCount;
+
+    // Get filtered notification count (only Unpaid, Overdue, Upcoming)
+    final notifications = ref.watch(notificationProvider);
+    final customers = ref.watch(customerProvider);
+
+    final filteredCount = notifications.where((n) {
+      try {
+        final customer = customers.firstWhere((c) => c.id == n.customerId);
+        final status = customer.status.toLowerCase();
+        return status == 'unpaid' || status == 'overdue' || status == 'upcoming';
+      } catch (e) {
+        return false;
+      }
+    }).length;
 
     return Scaffold(
       backgroundColor: AppColors.offWhiteOf(context),
       body: RefreshIndicator(
         onRefresh: () async {
+          final service = ref.read(statusUpdateServiceProvider);
+          await service.updateAllCustomerStatuses();
           await ref.read(dashboardProvider.notifier).refreshDashboard();
         },
         child: SingleChildScrollView(
@@ -116,7 +138,8 @@ class DashboardScreen extends ConsumerWidget {
                                       ),
                                     ),
 
-                                    if (unreadCount > 0)
+                                    // Use filtered count instead of total count
+                                    if (filteredCount > 0)
                                       Positioned(
                                         right: -2,
                                         top: -2,
@@ -134,9 +157,9 @@ class DashboardScreen extends ConsumerWidget {
                                             minHeight: 18,
                                           ),
                                           child: Text(
-                                            unreadCount > 9
+                                            filteredCount > 9
                                                 ? '9+'
-                                                : '$unreadCount',
+                                                : '$filteredCount',
                                             textAlign: TextAlign.center,
                                             style: const TextStyle(
                                               color: Colors.white,
@@ -165,13 +188,13 @@ class DashboardScreen extends ConsumerWidget {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              mainAxisExtent: 130,
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 12,
-                              crossAxisSpacing: 12,
-                              childAspectRatio: 1.4,
-                            ),
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          mainAxisExtent: 130,
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          childAspectRatio: 1.4,
+                        ),
                         itemBuilder: (context, index) {
                           final card = state.cards[index];
                           return _buildCard(card, context);
@@ -266,15 +289,15 @@ class DashboardScreen extends ConsumerWidget {
           ),
           const SizedBox(width: 8),
           Column(
-            crossAxisAlignment: .start,
-            mainAxisAlignment: .center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 card['title'],
                 style: TextStyle(
                   color: AppColors.darkGreyOf(context),
                   fontSize: 16,
-                  fontWeight: .w600,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               SizedBox(height: 4),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/app_colors.dart';
 import '../../../viewmodels/dashboard/notification_vm.dart';
+import '../../../viewmodels/customer_viewmodel/view_customer_vm.dart';
 import '../../../widgets/appbar.dart';
 import '../customer/customer_details_screen.dart';
 
@@ -44,7 +45,6 @@ class NotificationScreen extends ConsumerWidget {
   }
 
   String _extractStatus(String title) {
-    // Extract status from title like "Status Updated: Unpaid"
     if (title.contains(':')) {
       return title.split(':').last.trim();
     }
@@ -54,11 +54,28 @@ class NotificationScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifications = ref.watch(notificationProvider);
+    final customers = ref.watch(customerProvider);
+
+    // Filter: Only show notifications where customer status is Unpaid, Overdue, or Upcoming
+    final filteredNotifications = notifications.where((n) {
+      try {
+        final customer = customers.firstWhere(
+              (c) => c.id == n.customerId,
+        );
+
+        // Show notification only if status is Unpaid, Overdue, or Upcoming
+        final status = customer.status.toLowerCase();
+        return status == 'unpaid' || status == 'overdue' || status == 'upcoming';
+      } catch (e) {
+        // If customer not found, don't show notification
+        return false;
+      }
+    }).toList();
 
     return Scaffold(
       backgroundColor: AppColors.offWhiteOf(context),
       appBar: Appbar(text: "Notifications"),
-      body: notifications.isEmpty
+      body: filteredNotifications.isEmpty
           ? Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -89,12 +106,20 @@ class NotificationScreen extends ConsumerWidget {
       )
           : ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: notifications.length,
+        itemCount: filteredNotifications.length,
         itemBuilder: (context, index) {
-          final n = notifications[index];
-          final status = _extractStatus(n.title);
-          final statusColor = _getStatusColor(status);
-          final statusIcon = _getStatusIcon(status);
+          final n = filteredNotifications[index];
+
+          // Get CURRENT customer status from customerProvider
+          final customer = customers.firstWhere(
+                (c) => c.id == n.customerId,
+            orElse: () => customers.first, // This won't be reached due to filter
+          );
+
+          // Use current customer status
+          final currentStatus = customer.status;
+          final statusColor = _getStatusColor(currentStatus);
+          final statusIcon = _getStatusIcon(currentStatus);
 
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
@@ -103,7 +128,7 @@ class NotificationScreen extends ConsumerWidget {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha:0.04),
+                  color: Colors.black.withValues(alpha: 0.04),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -113,6 +138,7 @@ class NotificationScreen extends ConsumerWidget {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
+                  // Navigate to customer detail
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -134,7 +160,7 @@ class NotificationScreen extends ConsumerWidget {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: statusColor.withValues(alpha:0.1),
+                              color: statusColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Icon(
@@ -151,11 +177,11 @@ class NotificationScreen extends ConsumerWidget {
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: statusColor.withValues(alpha:0.15),
+                                color: statusColor.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
-                                status,
+                                currentStatus,
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.bold,
@@ -181,9 +207,12 @@ class NotificationScreen extends ConsumerWidget {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              AppColors.darkGreyOf(context).withValues(alpha:0.1),
-                              AppColors.darkGreyOf(context).withValues(alpha:0.05),
-                              AppColors.darkGreyOf(context).withValues(alpha:0.1),
+                              AppColors.darkGreyOf(context)
+                                  .withValues(alpha: 0.1),
+                              AppColors.darkGreyOf(context)
+                                  .withValues(alpha: 0.05),
+                              AppColors.darkGreyOf(context)
+                                  .withValues(alpha: 0.1),
                             ],
                           ),
                         ),
@@ -191,9 +220,9 @@ class NotificationScreen extends ConsumerWidget {
 
                       const SizedBox(height: 12),
 
-                      // Message
+                      // Message with customer name
                       Text(
-                        n.message,
+                        "Customer ${customer.name} payment status is now $currentStatus",
                         style: TextStyle(
                           fontSize: 14,
                           color: AppColors.slateGrayOf(context),
@@ -213,7 +242,7 @@ class NotificationScreen extends ConsumerWidget {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            "${n.date.day}/${n.date.month}/${n.date.year}",
+                            "${n.date.day}/${n.date.month}/${n.date.year} • ${n.date.hour.toString().padLeft(2, '0')}:${n.date.minute.toString().padLeft(2, '0')}",
                             style: TextStyle(
                               fontSize: 12,
                               color: AppColors.darkGreyOf(context),

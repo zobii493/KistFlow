@@ -90,13 +90,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   _buildSectionHeader('APP PREFERENCES', Icons.tune),
                   const SizedBox(height: 12),
                   _buildPreferencesCard(viewModel),
-                  const SizedBox(height: 24),
-                  _buildSectionHeader(
-                    'NOTIFICATIONS',
-                    Icons.notifications_active,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildNotificationsCard(viewModel),
+                  // const SizedBox(height: 24),
+                  //Todo: Notification Section
+                  // _buildSectionHeader(
+                  //   'NOTIFICATIONS',
+                  //   Icons.notifications_active,
+                  // ),
+                  // const SizedBox(height: 12),
+                  // _buildNotificationsCard(viewModel),
                   const SizedBox(height: 24),
                   _buildSectionHeader('ACCOUNT', Icons.person),
                   const SizedBox(height: 12),

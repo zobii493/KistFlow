@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -77,23 +78,31 @@ class CustomerCard extends ConsumerWidget {
                     color: AppColors.slateGray.withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child:
-                      (customer.imagePath != null &&
-                          customer.imagePath!.isNotEmpty)
+                  child: (customer.imagePath != null && customer.imagePath!.isNotEmpty)
                       ? ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.network(
-                            customer.imagePath!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Icon(
-                                Icons.image_not_supported,
-                                size: 32,
-                                color: AppColors.slateGray,
-                              );
-                            },
+                    borderRadius: BorderRadius.circular(12),
+                    child: CachedNetworkImage(
+                      imageUrl: customer.imagePath!,
+                      fit: BoxFit.cover,
+                      memCacheHeight: 200,  // Memory optimization
+                      memCacheWidth: 200,
+                      placeholder: (context, url) => Container(
+                        color: AppColors.slateGray.withValues(alpha: 0.3),
+                        child: const Center(
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
                           ),
-                        )
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Icon(
+                        Icons.image_not_supported,
+                        size: 32,
+                        color: AppColors.slateGray,
+                      ),
+                    ),
+                  )
                       : Icon(Icons.image, size: 32, color: AppColors.slateGray),
                 ),
                 const SizedBox(width: 16),
