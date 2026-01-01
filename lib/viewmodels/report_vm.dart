@@ -52,7 +52,7 @@ class ReportViewModel extends StateNotifier<AsyncValue<ReportState>> {
 
   ReportState _calculateReportStats(List<Customer> customers) {
 
-    // 🔹 OVERALL (ALL TIME) — NO FILTER
+    // OVERALL (ALL TIME) — NO FILTER
     final totalRev = _calculateTotalRevenue(customers);
     final expectedRev = _calculateExpectedRevenue(customers);
     final collRate = _calculateCollectionRate(totalRev, expectedRev);
@@ -65,7 +65,7 @@ class ReportViewModel extends StateNotifier<AsyncValue<ReportState>> {
     final revenueGrowth = _calculateGrowth(customers, 'revenue');
     final collectionGrowth = _calculateGrowth(customers, 'collection');
 
-    // 🔹 FILTERED — ONLY FOR REVENUE TREND
+    // FILTERED — ONLY FOR REVENUE TREND
     final filteredForTrend = _filterByPeriod(customers);
     final revData = _calculateRevenueTrend(filteredForTrend);
 
