@@ -223,6 +223,7 @@ class ReportViewModel extends StateNotifier<AsyncValue<ReportState>> {
       String category = 'Others';
       if (item.contains('phone') ||
           item.contains('mobile') ||
+          item.contains('mob') ||
           item.contains('samsung') ||
           item.contains('redmi') ||
           item.contains('vivo') ||
@@ -235,6 +236,8 @@ class ReportViewModel extends StateNotifier<AsyncValue<ReportState>> {
       else if (item.contains('fridge') ||
           item.contains('ac') ||
           item.contains('washing machine') ||
+          item.contains('iron') ||
+          item.contains('battery') ||
           item.contains('microwave'))
         category = 'Appliances';
       else if (item.contains('sofa') ||
@@ -328,9 +331,11 @@ class ReportViewModel extends StateNotifier<AsyncValue<ReportState>> {
   }
 
   String _formatNumber(double value) {
-    if (value >= 1000000) return '${(value / 1000000).toStringAsFixed(2)}M';
-    if (value >= 1000) return '${(value / 1000).toStringAsFixed(0)}K';
-    return value.toStringAsFixed(0);
+    // Always return full number with commas
+    return value.toStringAsFixed(0).replaceAllMapped(
+      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+    );
   }
 }
 
