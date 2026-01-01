@@ -51,20 +51,23 @@ class ReportViewModel extends StateNotifier<AsyncValue<ReportState>> {
   }
 
   ReportState _calculateReportStats(List<Customer> customers) {
-    final filteredCustomers = _filterByPeriod(customers);
 
-    final totalRev = _calculateTotalRevenue(filteredCustomers);
-    final expectedRev = _calculateExpectedRevenue(filteredCustomers);
+    // 🔹 OVERALL (ALL TIME) — NO FILTER
+    final totalRev = _calculateTotalRevenue(customers);
+    final expectedRev = _calculateExpectedRevenue(customers);
     final collRate = _calculateCollectionRate(totalRev, expectedRev);
-    final pendingAmount = _calculatePending(filteredCustomers);
+    final pendingAmount = _calculatePending(customers);
 
-    final revData = _calculateRevenueTrend(customers);
     final custGrowth = _calculateCustomerGrowth(customers);
-    final categories = _calculateCategories(filteredCustomers);
-    final topPerformers = _calculateTopItems(filteredCustomers);
+    final categories = _calculateCategories(customers);
+    final topPerformers = _calculateTopItems(customers);
 
     final revenueGrowth = _calculateGrowth(customers, 'revenue');
     final collectionGrowth = _calculateGrowth(customers, 'collection');
+
+    // 🔹 FILTERED — ONLY FOR REVENUE TREND
+    final filteredForTrend = _filterByPeriod(customers);
+    final revData = _calculateRevenueTrend(filteredForTrend);
 
     return ReportState(
       totalRevenue: {
@@ -98,11 +101,11 @@ class ReportViewModel extends StateNotifier<AsyncValue<ReportState>> {
         'title': 'Pending',
         'value': _formatNumber(pendingAmount),
         'status':
-            '${customers.where((c) => c.status == 'Overdue').length} overdue',
+        '${customers.where((c) => c.status == 'Overdue').length} overdue',
         'statusColor': Colors.redAccent,
         'statusIcon': Icons.watch_later_rounded,
       },
-      revenueData: revData,
+      revenueData: revData, // filtered only here
       customerGrowthData: custGrowth,
       categoryData: categories,
       topItems: topPerformers,
@@ -111,6 +114,7 @@ class ReportViewModel extends StateNotifier<AsyncValue<ReportState>> {
 
   List<Customer> _filterByPeriod(List<Customer> customers) {
     final now = DateTime.now();
+
     return customers.where((customer) {
       final createdAt = customer.createdAt;
 
@@ -118,14 +122,23 @@ class ReportViewModel extends StateNotifier<AsyncValue<ReportState>> {
         case 'This Week':
           final weekAgo = now.subtract(const Duration(days: 7));
           return createdAt.isAfter(weekAgo);
+
         case 'This Month':
-          return createdAt.month == now.month && createdAt.year == now.year;
+          return createdAt.month == now.month &&
+              createdAt.year == now.year;
+
         case 'This Year':
-        default:
           return createdAt.year == now.year;
+
+        case 'Last Year':
+          return createdAt.year == now.year - 1;
+
+        default:
+          return true;
       }
     }).toList();
   }
+
 
   double _calculateTotalRevenue(List<Customer> customers) => customers.fold(
     0.0,
@@ -147,10 +160,17 @@ class ReportViewModel extends StateNotifier<AsyncValue<ReportState>> {
 
   List<Map<String, dynamic>> _calculateRevenueTrend(List<Customer> customers) {
     final now = DateTime.now();
+
+    // Decide chart year
+    int chartYear = now.year;
+    if (selectedPeriod == 'Last Year') {
+      chartYear = now.year - 1;
+    }
+
     final List<Map<String, dynamic>> monthlyData = [];
 
     for (int i = 0; i < 12; i++) {
-      final month = DateTime(now.year, i + 1);
+      final month = DateTime(chartYear, i + 1);
       double revenue = 0.0;
 
       for (var customer in customers) {
@@ -161,11 +181,14 @@ class ReportViewModel extends StateNotifier<AsyncValue<ReportState>> {
                 paymentDate.year == month.year) {
               revenue += double.parse(payment['paid'].toString());
             }
-          } catch (e) {}
+          } catch (_) {}
         }
       }
 
-      monthlyData.add({'month': i, 'revenue': revenue});
+      monthlyData.add({
+        'month': i,
+        'revenue': revenue,
+      });
     }
 
     return monthlyData;

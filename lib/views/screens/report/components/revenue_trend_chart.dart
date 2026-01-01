@@ -80,7 +80,7 @@ class RevenueTrendChart extends StatelessWidget {
         value: selectedPeriod,
         underline: SizedBox(),
         isDense: true,
-        items: ['This Year', 'This Month', 'This Week'].map((String value) {
+        items: ['This Year', 'Last Year','This Month', 'This Week'].map((String value) {
           return DropdownMenuItem<String>(
             value: value,
             child: Text(value, style: TextStyle(fontSize: 12)),
