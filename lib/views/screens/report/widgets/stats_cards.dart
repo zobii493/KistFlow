@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/app_colors.dart';
 
 class StatsCards extends StatelessWidget {
@@ -131,7 +132,7 @@ class _StatCard extends StatelessWidget {
               Flexible(
                 child: Text(
                   data['value'],
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     color: AppColors.slateGrayOf(context),
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

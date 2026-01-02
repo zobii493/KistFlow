@@ -24,6 +24,7 @@ class ReportViewModel extends StateNotifier<AsyncValue<ReportState>> {
     selectedPeriod = value;
     _listenToCustomerChanges(); // reload with new period
   }
+
   void _listenToCustomerChanges() {
     // Cancel previous subscription if exists
     _subscription?.cancel();
@@ -38,20 +39,22 @@ class ReportViewModel extends StateNotifier<AsyncValue<ReportState>> {
         .doc(user.uid)
         .collection('customers')
         .snapshots()
-        .listen((snapshot) {
-      final customers = snapshot.docs
-          .map((doc) => Customer.fromFirestore(doc.data(), doc.id))
-          .toList();
+        .listen(
+          (snapshot) {
+            final customers = snapshot.docs
+                .map((doc) => Customer.fromFirestore(doc.data(), doc.id))
+                .toList();
 
-      final report = _calculateReportStats(customers);
-      state = AsyncData(report);
-    }, onError: (error) {
-      state = AsyncError(error,StackTrace.current);
-    });
+            final report = _calculateReportStats(customers);
+            state = AsyncData(report);
+          },
+          onError: (error) {
+            state = AsyncError(error, StackTrace.current);
+          },
+        );
   }
 
   ReportState _calculateReportStats(List<Customer> customers) {
-
     // OVERALL (ALL TIME) — NO FILTER
     final totalRev = _calculateTotalRevenue(customers);
     final expectedRev = _calculateExpectedRevenue(customers);
@@ -101,11 +104,12 @@ class ReportViewModel extends StateNotifier<AsyncValue<ReportState>> {
         'title': 'Pending',
         'value': _formatNumber(pendingAmount),
         'status':
-        '${customers.where((c) => c.status == 'Overdue').length} overdue',
+            '${customers.where((c) => c.status == 'Overdue').length} overdue',
         'statusColor': Colors.redAccent,
         'statusIcon': Icons.watch_later_rounded,
       },
-      revenueData: revData, // filtered only here
+      revenueData: revData,
+      // filtered only here
       customerGrowthData: custGrowth,
       categoryData: categories,
       topItems: topPerformers,
@@ -124,8 +128,7 @@ class ReportViewModel extends StateNotifier<AsyncValue<ReportState>> {
           return createdAt.isAfter(weekAgo);
 
         case 'This Month':
-          return createdAt.month == now.month &&
-              createdAt.year == now.year;
+          return createdAt.month == now.month && createdAt.year == now.year;
 
         case 'This Year':
           return createdAt.year == now.year;
@@ -138,7 +141,6 @@ class ReportViewModel extends StateNotifier<AsyncValue<ReportState>> {
       }
     }).toList();
   }
-
 
   double _calculateTotalRevenue(List<Customer> customers) => customers.fold(
     0.0,
@@ -185,10 +187,7 @@ class ReportViewModel extends StateNotifier<AsyncValue<ReportState>> {
         }
       }
 
-      monthlyData.add({
-        'month': i,
-        'revenue': revenue,
-      });
+      monthlyData.add({'month': i, 'revenue': revenue});
     }
 
     return monthlyData;
@@ -221,6 +220,8 @@ class ReportViewModel extends StateNotifier<AsyncValue<ReportState>> {
     for (var customer in customers) {
       final item = customer.itemName.toLowerCase();
       String category = 'Others';
+
+      // Electronics
       if (item.contains('phone') ||
           item.contains('mobile') ||
           item.contains('mob') ||
@@ -231,20 +232,39 @@ class ReportViewModel extends StateNotifier<AsyncValue<ReportState>> {
           item.contains('realme') ||
           item.contains('laptop') ||
           item.contains('iphone') ||
-          item.contains('tablet'))
+          item.contains('tablet')) {
         category = 'Electronics';
+      }
+      // Motorcycle (NEW)
+      else if (item.contains('bike') ||
+          item.contains('motorcycle') ||
+          item.contains('motor bike') ||
+          item.contains('honda') ||
+          item.contains('yamaha') ||
+          item.contains('suzuki') ||
+          item.contains('unique') ||
+          item.contains('super power') ||
+          item.contains('road prince') ||
+          item.contains('cg125') ||
+          item.contains('cd70')) {
+        category = 'Motorcycle';
+      }
+      // Appliances
       else if (item.contains('fridge') ||
           item.contains('ac') ||
           item.contains('washing machine') ||
           item.contains('iron') ||
           item.contains('battery') ||
-          item.contains('microwave'))
+          item.contains('microwave')) {
         category = 'Appliances';
+      }
+      // Furniture
       else if (item.contains('sofa') ||
           item.contains('bed') ||
           item.contains('table') ||
-          item.contains('chair'))
+          item.contains('chair')) {
         category = 'Furniture';
+      }
 
       categoryCount[category] = (categoryCount[category] ?? 0) + 1;
     }
@@ -332,10 +352,12 @@ class ReportViewModel extends StateNotifier<AsyncValue<ReportState>> {
 
   String _formatNumber(double value) {
     // Always return full number with commas
-    return value.toStringAsFixed(0).replaceAllMapped(
-      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+    return value
+        .toStringAsFixed(0)
+        .replaceAllMapped(
+          RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
           (Match m) => '${m[1]},',
-    );
+        );
   }
 }
 

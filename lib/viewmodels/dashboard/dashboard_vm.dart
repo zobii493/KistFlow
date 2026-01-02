@@ -18,6 +18,7 @@ class DashboardViewModel extends StateNotifier<DashboardState> {
     barData: [],
     pieData: [],
     lineData: [],
+    planCounts: {6:0, 9:0, 12:0},
   )) {
     loadDashboardData();
   }
@@ -51,6 +52,7 @@ class DashboardViewModel extends StateNotifier<DashboardState> {
     final overdueCount = customers.where((c) => c.status == 'Overdue').length;
     final upcomingCount = customers.where((c) => c.status == 'Upcoming').length;
     final completedCount = customers.where((c) => c.status == 'Completed').length;
+    final planCounts = _calculatePlanCounts(customers);
 
     final cards = [
       {
@@ -94,8 +96,27 @@ class DashboardViewModel extends StateNotifier<DashboardState> {
       barData: barData,
       pieData: pieData,
       lineData: lineData,
+      planCounts: planCounts,
     );
   }
+
+  Map<int, int> _calculatePlanCounts(List<Customer> customers) {
+    final Map<int, int> counts = {
+      6: 0,
+      9: 0,
+      12: 0,
+    };
+
+    for (final c in customers) {
+      final months = int.tryParse(c.installmentMonths ?? '');
+      if (months != null && counts.containsKey(months)) {
+        counts[months] = counts[months]! + 1;
+      }
+    }
+
+    return counts;
+  }
+
 
   /// Calculate monthly collection for last 6 months
   List<double> _calculateMonthlyCollection(List<Customer> customers) {

@@ -217,6 +217,24 @@ class AddCustomerViewModel extends ChangeNotifier {
     return next.toIso8601String().split("T").first;
   }
 
+  void selectMonthsFromDropdown(int months) {
+    selectedMonths = months;
+
+    // Interest mapping
+    if (months == 6) {
+      interestPercent = 25;
+    } else if (months == 9) {
+      interestPercent = 32;
+    } else if (months == 12) {
+      interestPercent = 36; // 1 year = 36%
+    }
+
+    installmentMonths.text = months.toString();
+    notifyListeners();
+    _updateInstallmentCalculation();
+  }
+
+
   void clearAllFields() {
     fullName.clear();
     fatherName.clear();

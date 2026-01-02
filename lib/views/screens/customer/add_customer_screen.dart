@@ -205,11 +205,29 @@ class _AddCustomerScreenState extends ConsumerState<AddCustomerScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildLabel('Installment Months', isRequired: true),
-                    Row(
-                      children: [
-                        _monthButton(vm, 6, '6 Months', 25),
-                        _monthButton(vm, 9, '9 Months', 32),
-                      ],
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.offWhiteOf(context),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: DropdownButtonFormField<int>(
+                        initialValue: vm.selectedMonths,
+                        hint: const Text('Select Months'),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                        ),
+                        items: const [
+                          DropdownMenuItem(value: 6, child: Text('6 Months')),
+                          DropdownMenuItem(value: 9, child: Text('9 Months')),
+                          DropdownMenuItem(value: 12, child: Text('1 Year')),
+                        ],
+                        onChanged: (value) {
+                          if (value != null) {
+                            vm.selectMonthsFromDropdown(value);
+                          }
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -280,36 +298,6 @@ class _AddCustomerScreenState extends ConsumerState<AddCustomerScreen> {
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _monthButton(
-      AddCustomerViewModel vm,
-      int months,
-      String text,
-      double interest,
-      ) {
-    final isSelected = vm.selectedMonths == months;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => vm.selectMonths(months, interest),
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          decoration: BoxDecoration(
-            color: isSelected ? AppColors.primaryTealOf(context) : AppColors.offWhiteOf(context),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            text,
-            style: TextStyle(
-              color: isSelected ? Colors.white : AppColors.slateGrayOffWhiteOf(context),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
       ),
     );
   }

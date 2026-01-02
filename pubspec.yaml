@@ -53,7 +53,7 @@ dependencies:
   intl: ^0.20.2
   confetti: ^0.8.0
   cached_network_image: ^3.4.1
-#  supabase_flutter: ^2.10.3
+  google_fonts: ^6.3.3
 
 dev_dependencies:
   flutter_test:

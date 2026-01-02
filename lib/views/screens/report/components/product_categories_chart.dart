@@ -16,6 +16,7 @@ class ProductCategoriesChart extends StatelessWidget {
       AppColors.primaryTealOf(context).withValues(alpha:0.7),
       AppColors.warmAmberOf(context).withValues(alpha:0.7),
       AppColors.pinkOf(context).withValues(alpha:0.7),
+      Color(0xff0cc718).withValues(alpha:0.7),
     ];
 
     return Container(
